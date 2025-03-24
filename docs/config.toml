@@ -1,4 +1,4 @@
-baseURL = 'https://courses.pages.gitlab.lrz.de/alg2/goal-core'
+baseURL = 'https://hm.pages.gitlab.lrz.de/goal-core'
 languageCode = 'de-de'
 title = 'GoAL Core'
 themesDir = "themes"
