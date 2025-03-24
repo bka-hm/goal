@@ -1,0 +1,19 @@
+baseURL = 'https://hm.pages.gitlab.lrz.de/goal'
+languageCode = 'de-de'
+title = 'GoAL - Go Algorithms Library'
+themesDir = "themes"
+theme = "hugo-whisper-theme"
+
+[[menu.main]]
+    name = "Home"
+    url = "/"
+    weight = 1
+
+[[menu.main]]
+    name = "Graphs"
+    url = "/graphs/"
+    weight = 3
+
+[params.logo]
+    mobile = "images/logo.png"
+    standard  = "images/logo.png"
