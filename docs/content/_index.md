@@ -6,6 +6,9 @@ title: 'GoAL'
 
 ## Go Algorithms Library (Core)
 
+[we're on Gitlab](https://gitlab.lrz.de/hm/goal-core)
+
+
 Hochschule München
 
 
