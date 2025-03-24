@@ -1,0 +1,10 @@
+.hugo_build.lock
+resources
+public
+.DS_Store
+node_modules
+.idea
+terminal
+
+cover.out
+.vscode/

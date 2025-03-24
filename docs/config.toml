@@ -1,0 +1,19 @@
+baseURL = 'https://courses.pages.gitlab.lrz.de/alg2/goal-core'
+languageCode = 'de-de'
+title = 'GoAL Core'
+themesDir = "themes"
+theme = "hugo-whisper-theme"
+
+[[menu.main]]
+    name = "Home"
+    url = "/"
+    weight = 1
+
+[[menu.main]]
+    name = "Graphs"
+    url = "/graphs/"
+    weight = 3
+
+[params.logo]
+    mobile = "images/logo.png"
+    standard  = "images/logo.png"
