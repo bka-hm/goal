@@ -241,3 +241,12 @@ func (graph *Graph) RemoveVertex(vertex *Vertex) {
 		vertexMap.notifyVertexRemoval(index)
 	}
 }
+
+// CreateVertices creates a given number of vertices
+func (graph *Graph) CreateVertices(n int) []*Vertex {
+	result := make([]*Vertex, n)
+	for i := 0; i < n; i++ {
+		result[i] = graph.CreateVertex()
+	}
+	return result
+}

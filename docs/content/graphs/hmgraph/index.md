@@ -29,7 +29,10 @@ w.CreateEdge(v)
 ```
 
 All operations run in (amortized) constant time (O(1)). Creation of loop edges will result in an
-error; loop arcs are allowed as well as parallel edges/arcs (multi-edges/arcs).
+error; loop arcs are allowed as well as parallel edges/arcs (multi-edges/arcs). A given
+number of vertices can be created at once using the function ```CreateVertices(n int)```.
+
+
 ## Conversion to `string`
 Graphs support standard conversion to `string`:
 ```go
