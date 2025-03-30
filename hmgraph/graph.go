@@ -80,6 +80,15 @@ func (vertex *Vertex) CreateArc(target *Vertex) *Arc {
 	return arc
 }
 
+// CreateArcs creates several arcs at once in O(len(target)).
+func (vertex *Vertex) CreateArcs(target []*Vertex) []*Arc {
+	arcs := make([]*Arc, len(target))
+	for i, al := range target {
+		arcs[i] = vertex.CreateArc(al)
+	}
+	return arcs
+}
+
 // CreateEdge creates an edge in amortized O(1)
 // caveat: may create multi-edges if edge already exists
 // panics when creating a loop.
