@@ -1,4 +1,4 @@
-module gitlab.lrz.de/courses/alg2/goal-core
+module gitlab.lrz.de/hm/goal-core
 
 go 1.23.0
 
