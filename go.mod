@@ -1,8 +1,6 @@
-module gitlab.lrz.de/hm/goal-core
+module gilab.lrz.de/hm/goal-core
 
-go 1.23.0
-
-toolchain go1.23.7
+go 1.23.7
 
 require (
 	github.com/stretchr/testify v1.10.0
