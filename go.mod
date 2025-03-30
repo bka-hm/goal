@@ -1,4 +1,4 @@
-module gilab.lrz.de/hm/goal-core
+module gitlab.lrz.de/hm/goal-core
 
 go 1.23.7
 
