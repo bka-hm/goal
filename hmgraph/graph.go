@@ -259,3 +259,8 @@ func (graph *Graph) CreateVertices(n int) []*Vertex {
 	}
 	return result
 }
+
+// MapCount returns the number of active maps.
+func (graph *Graph) MapCount() (vertexMapCount int, arcMapCount int, edgeMapCount int) {
+	return len(graph.vertexMaps), len(graph.arcMaps), len(graph.edgeMaps)
+}
