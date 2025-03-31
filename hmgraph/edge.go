@@ -39,6 +39,11 @@ func (edge *Edge) Vertices() [2]*Vertex {
 	return [2]*Vertex{edge.vertices[0], edge.vertices[1]}
 }
 
+// IsIncident returns whether the edge is incident to a given vertex
+func (edge *Edge) IsIncident(vertex *Vertex) bool {
+	return vertex == edge.vertices[0] || vertex == edge.vertices[1]
+}
+
 // String returns a format string including edge map information
 func (edge *Edge) String() string {
 	result := fmt.Sprintf("Edge #%d---#%d",
