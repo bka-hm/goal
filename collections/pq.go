@@ -15,13 +15,13 @@ type PriorityQueue[E any, K constraints.Ordered] interface {
 	// DecreaseKey decreases the key of the specified handle, may error
 	// if the handle is not valid for the specific implementation
 	// or if the current key is lower than the value to change to.
-	DecreaseKey(handle base.Handle, key K) error
+	DecreaseKey(handle base.Handle, key K)
 
 	// Remove removes an element given as handle.
-	Remove(handle base.Handle) base.Handle
+	Remove(handle base.Handle)
 
 	// ExtractMin returns the Value of the minimal element if it exists.
-	ExtractMin() (E, K, error)
+	ExtractMin() (E, K)
 
 	// IsEmpty shows if the queue is empty
 	IsEmpty() bool
