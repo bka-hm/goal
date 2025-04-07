@@ -1,4 +1,4 @@
-package pq
+package collections
 
 import (
 	"gitlab.lrz.de/hm/goal-core/base"
