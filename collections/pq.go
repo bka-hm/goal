@@ -6,11 +6,11 @@ import (
 )
 
 // PriorityQueue Implements a Priority Min-Queue.
-type PriorityQueue[V any, K constraints.Ordered] interface {
+type PriorityQueue[E any, K constraints.Ordered] interface {
 
 	// Insert an element with value V and the key K and return the Handle.
 	// Note: Must accept a non-unique keys
-	Insert(value V, key K) base.Handle
+	Insert(element E, key K) base.Handle
 
 	// DecreaseKey decreases the key of the specified handle, may error
 	// if the handle is not valid for the specific implementation
@@ -21,7 +21,7 @@ type PriorityQueue[V any, K constraints.Ordered] interface {
 	Remove(handle base.Handle) base.Handle
 
 	// ExtractMin returns the Value of the minimal element if it exists.
-	ExtractMin() (V, K, error)
+	ExtractMin() (E, K, error)
 
 	// IsEmpty shows if the queue is empty
 	IsEmpty() bool
