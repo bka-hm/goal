@@ -5,7 +5,7 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-// PriorityQueue Implements a Priority Min-Queue.
+// PriorityQueue is a Priority Min-Queue.
 type PriorityQueue[E any, K constraints.Ordered] interface {
 
 	// Insert an element with value V and the key K and return the Handle.
@@ -21,7 +21,7 @@ type PriorityQueue[E any, K constraints.Ordered] interface {
 	Remove(handle base.Handle)
 
 	// ExtractMin returns the Value of the minimal element if it exists.
-	ExtractMin() (E, K)
+	ExtractMin() (element E, key K)
 
 	// IsEmpty shows if the queue is empty
 	IsEmpty() bool
