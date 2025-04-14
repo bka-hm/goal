@@ -20,8 +20,12 @@ type PriorityQueue[E any, K constraints.Ordered] interface {
 	// Remove removes an element given as handle.
 	Remove(handle base.Handle)
 
-	// ExtractMin returns the Value of the minimal element if it exists.
+	// ExtractMin returns the Value of the minimal element if it exists and
+	// removes it from the queue.
 	ExtractMin() (element E, key K)
+
+	// ExtractMin returns the Value of the minimal element if it exists.
+	GetMin() (element E, key K)
 
 	// IsEmpty shows if the queue is empty
 	IsEmpty() bool
