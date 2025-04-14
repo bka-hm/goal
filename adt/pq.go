@@ -1,4 +1,4 @@
-package collections
+package adt
 
 import (
 	"gitlab.lrz.de/hm/goal-core/base"
