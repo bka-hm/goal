@@ -24,8 +24,11 @@ type PriorityQueue[E any, K constraints.Ordered] interface {
 	// removes it from the queue.
 	ExtractMin() (element E, key K)
 
-	// ExtractMin returns the Value of the minimal element if it exists.
+	// GetMin returns the minimal element if it exists.
 	GetMin() (element E, key K)
+
+	// GetKey returns the current key of an element.
+	GetKey(handle base.Handle) (key K)
 
 	// IsEmpty shows if the queue is empty
 	IsEmpty() bool
