@@ -14,5 +14,5 @@ type DisjointSet[E any] interface {
 	Union(first base.Handle, second base.Handle)
 
 	// Find returns the unique representative for the containing set
-	Find(handle base.Handle) (E, base.Handle)
+	Find(handle base.Handle) E
 }
