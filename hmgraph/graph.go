@@ -2,6 +2,7 @@ package hmgraph
 
 import (
 	"fmt"
+	"slices"
 )
 
 // A Graph is a struct of vertices and both arcs and
@@ -137,10 +138,7 @@ func (graph *Graph) ForVertices(visitor VertexVisitor) {
 // Please note that the preferred way of iterating over all vertices
 // is the ForVertices function.
 func (graph *Graph) GetVertices() (vertices []*Vertex) {
-	graph.ForVertices(func(vertex *Vertex) {
-		vertices = append(vertices, vertex)
-	})
-	return
+	return slices.Clone(graph.vertices)
 }
 
 // ForArcs runs a function on all arcs in O(m) time (m=number of arcs)
@@ -150,11 +148,27 @@ func (graph *Graph) ForArcs(visitor ArcVisitor) {
 	}
 }
 
+// GetArcs returns a slice containing all arcs without giving access
+// to the underlying structures in O(n).
+// Please note that the preferred way of iterating over all arcs
+// is the ForArcs function.
+func (graph *Graph) GetArcs() (arcs []*Arc) {
+	return slices.Clone(graph.arcs)
+}
+
 // ForEdges calls a visitor on all edges in O(m) time
 func (graph *Graph) ForEdges(visitor EdgeVisitor) {
 	for _, edge := range graph.edges {
 		visitor(edge)
 	}
+}
+
+// GetEdges returns a slice containing all edges without giving access
+// to the underlying structures in O(n).
+// Please note that the preferred way of iterating over all edges
+// is the ForEdges function.
+func (graph *Graph) GetEdges() (edges []*Edge) {
+	return slices.Clone(graph.edges)
 }
 
 // String converts a graph with all attached data in human-readable form

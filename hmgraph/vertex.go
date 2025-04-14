@@ -1,6 +1,9 @@
 package hmgraph
 
-import "fmt"
+import (
+	"fmt"
+	"slices"
+)
 
 // A Vertex is a struct containing all incident arcs and edges.
 type Vertex struct {
@@ -41,6 +44,14 @@ func (vertex *Vertex) ForOutArcs(visitor ArcVisitor) {
 	}
 }
 
+// GetOutArcs returns a slice containing all outgoing arcs
+// without giving access to the underlying structures in O(outdeg(v)).
+// Please note that the preferred way of iterating over all outgoing arcs
+// is the ForOutArcs function.
+func (vertex *Vertex) GetOutArcs() (outArcs []*Arc) {
+	return slices.Clone(vertex.outArcs)
+}
+
 // ForInArcs calls a visitor on a vertex's incoming arcs in O(InDegree(vertex)) time
 func (vertex *Vertex) ForInArcs(visitor ArcVisitor) {
 	for _, arc := range vertex.inArcs {
@@ -48,11 +59,27 @@ func (vertex *Vertex) ForInArcs(visitor ArcVisitor) {
 	}
 }
 
+// GetInArcs returns a slice containing all ingoing arcs
+// without giving access to the underlying structures in O(indeg(v)).
+// Please note that the preferred way of iterating over all ingoing arcs
+// is the ForInArcs function.
+func (vertex *Vertex) GetInArcs() (inArcs []*Arc) {
+	return slices.Clone(vertex.inArcs)
+}
+
 // ForEdges calls a visitor on a vertex's edges in O(Degree(vertex)) time
 func (vertex *Vertex) ForEdges(visitor EdgeVisitor) {
 	for _, edge := range vertex.edges {
 		visitor(edge)
 	}
+}
+
+// GetEdges returns a slice containing all incident edges
+// without giving access to the underlying structures in O(deg(v)).
+// Please note that the preferred way of iterating over all edges
+// is the ForEdges function.
+func (vertex *Vertex) GetEdges() (edges []*Edge) {
+	return slices.Clone(vertex.edges)
 }
 
 // GetIndex returns the vertex's index (not stable under graph modifications!)
@@ -93,11 +120,4 @@ func (vertex *Vertex) String() string {
 		result += "\n  }"
 	}
 	return result
-}
-
-func (vertex *Vertex) GetEdges() (edges []*Edge) {
-	for _, e := range vertex.edges {
-		edges = append(edges, e)
-	}
-	return edges
 }
