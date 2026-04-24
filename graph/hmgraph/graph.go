@@ -191,6 +191,14 @@ func (graph *Graph) AnyVertex() *Vertex {
 	return graph.vertices[0]
 }
 
+// AnyEdge returns an arbitrary edge of the graph.
+func (graph *Graph) AnyEdge() *Edge {
+	if len(graph.edges) == 0 {
+		panic("graph is empty")
+	}
+	return graph.edges[0]
+}
+
 // RemoveEdge removes an edge from the graph. It uses the swap-and-shrink
 // approach to work in O(1) but with a need to update incident vertices and
 // all edge-maps about the change.
