@@ -1,6 +1,6 @@
 ---
 title: 'Acyclic'
-weight: 2
+weight: 3
 summary: The `graphs/acyclic` package provides topological ordering and DAG detection for directed graphs.
 ---
 

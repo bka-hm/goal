@@ -12,7 +12,7 @@ type DisjointSets[E any] interface {
 	MakeSet(element E) base.Handle
 
 	// Union merges the two sets identified by the given handles.
-	Union(first base.Handle, second base.Handle)
+	Union(first, second base.Handle)
 
 	// Find returns the unique representative for the containing set
 	Find(handle base.Handle) E
