@@ -2,12 +2,14 @@
 package pq
 
 import (
+	"cmp"
+
 	"gitlab.lrz.de/hm/goal/base"
-	"golang.org/x/exp/constraints"
 )
 
-// PriorityQueue is a Priority Min-Queue.
-type PriorityQueue[E any, K constraints.Ordered] interface {
+// PriorityQueue is a Priority Min-Queue. It stores Elements of a generic type E with a priority of type K.
+// To align with literature, the priority is called "key" throughout
+type PriorityQueue[E any, K cmp.Ordered] interface {
 
 	// Insert adds an element with the given key and returns a handle to it.
 	// Must accept non-unique keys.
