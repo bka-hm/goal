@@ -1,12 +1,12 @@
-// Package disjointset provides a Disjoint-Set (union-find) data structure.
-package disjointset
+// Package disjointsets provides a Disjoint-Set (union-find) data structure.
+package disjointsets
 
 import (
 	"gitlab.lrz.de/hm/goal/base"
 )
 
-// DisjointSet is a Disjoint-Set data structure (providing union/find operations).
-type DisjointSet[E any] interface {
+// DisjointSets is an interface for Disjoint-Sets types (providing union/find operations).
+type DisjointSets[E any] interface {
 
 	// MakeSet adds an element as a trivial subset.
 	MakeSet(element E) base.Handle
