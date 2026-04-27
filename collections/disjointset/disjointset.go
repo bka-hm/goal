@@ -6,7 +6,7 @@ import (
 )
 
 // DisjointSet is a Disjoint-Set data structure (providing union/find operations).
-type DisjointSet[E any] interface {
+type DisjointSets[E any] interface {
 
 	// MakeSet adds an element as a trivial subset.
 	MakeSet(element E) base.Handle
