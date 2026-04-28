@@ -192,11 +192,51 @@ func (graph *Graph) AnyVertex() *Vertex {
 }
 
 // AnyEdge returns an arbitrary edge of the graph.
+// Panics if the graph contains no edges.
 func (graph *Graph) AnyEdge() *Edge {
 	if len(graph.edges) == 0 {
-		panic("graph is empty")
+		panic("graph contains no edges")
 	}
 	return graph.edges[0]
+}
+
+// AnyArc returns an arbitrary arc of the graph.
+// Panics if the graph contains no arcs.
+func (graph *Graph) AnyArc() *Arc {
+	if len(graph.arcs) == 0 {
+		panic("graph contains no arcs")
+	}
+	return graph.arcs[0]
+}
+
+// AnyVertexWhere returns an arbitrary vertex satisfying predicate, or nil if none does.
+func (graph *Graph) AnyVertexWhere(predicate func(*Vertex) bool) *Vertex {
+	for _, v := range graph.vertices {
+		if predicate(v) {
+			return v
+		}
+	}
+	return nil
+}
+
+// AnyArcWhere returns an arbitrary arc satisfying predicate, or nil if none does.
+func (graph *Graph) AnyArcWhere(predicate func(*Arc) bool) *Arc {
+	for _, a := range graph.arcs {
+		if predicate(a) {
+			return a
+		}
+	}
+	return nil
+}
+
+// AnyEdgeWhere returns an arbitrary edge satisfying predicate, or nil if none does.
+func (graph *Graph) AnyEdgeWhere(predicate func(*Edge) bool) *Edge {
+	for _, e := range graph.edges {
+		if predicate(e) {
+			return e
+		}
+	}
+	return nil
 }
 
 // RemoveEdge removes an edge from the graph. It uses the swap-and-shrink
