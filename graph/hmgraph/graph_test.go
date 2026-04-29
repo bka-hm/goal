@@ -8,6 +8,30 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestMapCount(t *testing.T) {
+	g := NewGraph()
+	v, a, e := g.MapCount()
+	assert.Equal(t, 0, v)
+	assert.Equal(t, 0, a)
+	assert.Equal(t, 0, e)
+
+	vm := CreateVertexMap(g, "x", 0)
+	am := CreateArcMap(g, "y", 0)
+	em := CreateEdgeMap(g, "z", 0)
+	v, a, e = g.MapCount()
+	assert.Equal(t, 1, v)
+	assert.Equal(t, 1, a)
+	assert.Equal(t, 1, e)
+
+	vm.Dispose()
+	am.Dispose()
+	em.Dispose()
+	v, a, e = g.MapCount()
+	assert.Equal(t, 0, v)
+	assert.Equal(t, 0, a)
+	assert.Equal(t, 0, e)
+}
+
 func TestGraphCreation(t *testing.T) {
 	g := NewGraph()
 	assert.Equal(t, 0, g.VertexCount(), "new graph should be empty.")
@@ -416,6 +440,111 @@ func TestAnyVertexPanics(t *testing.T) {
 	assert.Panics(t, func() { g.AnyVertex() })
 }
 
+func TestAnyArc(t *testing.T) {
+	g := NewGraph()
+	u := g.CreateVertex()
+	v := g.CreateVertex()
+	a1 := u.CreateArc(v)
+	a2 := v.CreateArc(u)
+	assert.True(t, g.AnyArc() == a1 || g.AnyArc() == a2)
+}
+
+func TestAnyArcPanics(t *testing.T) {
+	g := NewGraph()
+	assert.Panics(t, func() { g.AnyArc() })
+}
+
+func TestAnyEdge(t *testing.T) {
+	g := NewGraph()
+	u := g.CreateVertex()
+	v := g.CreateVertex()
+	e1 := u.CreateEdge(v)
+	w := g.CreateVertex()
+	e2 := v.CreateEdge(w)
+	assert.True(t, g.AnyEdge() == e1 || g.AnyEdge() == e2)
+}
+
+func TestAnyEdgePanics(t *testing.T) {
+	g := NewGraph()
+	assert.Panics(t, func() { g.AnyEdge() })
+}
+
+func TestAnyVertexWhereMatch(t *testing.T) {
+	g := NewGraph()
+	u := g.CreateVertex()
+	v := g.CreateVertex()
+	u.CreateArc(v)
+	result := g.AnyVertexWhere(func(v *Vertex) bool { return v.OutDegree() > 0 })
+	assert.Equal(t, u, result)
+}
+
+func TestAnyVertexWhereNoMatch(t *testing.T) {
+	g := NewGraph()
+	g.CreateVertex()
+	g.CreateVertex()
+	result := g.AnyVertexWhere(func(v *Vertex) bool { return v.OutDegree() > 0 })
+	assert.Nil(t, result)
+}
+
+func TestAnyVertexWhereEmptyGraph(t *testing.T) {
+	g := NewGraph()
+	result := g.AnyVertexWhere(func(v *Vertex) bool { return true })
+	assert.Nil(t, result)
+}
+
+func TestAnyArcWhereMatch(t *testing.T) {
+	g := NewGraph()
+	u := g.CreateVertex()
+	v := g.CreateVertex()
+	w := g.CreateVertex()
+	u.CreateArc(v)
+	target := v.CreateArc(w)
+	result := g.AnyArcWhere(func(a *Arc) bool { return a.Target() == w })
+	assert.Equal(t, target, result)
+}
+
+func TestAnyArcWhereNoMatch(t *testing.T) {
+	g := NewGraph()
+	u := g.CreateVertex()
+	v := g.CreateVertex()
+	u.CreateArc(v)
+	result := g.AnyArcWhere(func(a *Arc) bool { return a.Target() == u })
+	assert.Nil(t, result)
+}
+
+func TestAnyArcWhereEmptyGraph(t *testing.T) {
+	g := NewGraph()
+	result := g.AnyArcWhere(func(a *Arc) bool { return true })
+	assert.Nil(t, result)
+}
+
+func TestAnyEdgeWhereMatch(t *testing.T) {
+	g := NewGraph()
+	u := g.CreateVertex()
+	v := g.CreateVertex()
+	w := g.CreateVertex()
+	u.CreateEdge(v)
+	target := v.CreateEdge(w)
+	result := g.AnyEdgeWhere(func(e *Edge) bool { return e.IsIncident(w) })
+	assert.Equal(t, target, result)
+}
+
+func TestAnyEdgeWhereNoMatch(t *testing.T) {
+	g := NewGraph()
+	u := g.CreateVertex()
+	v := g.CreateVertex()
+	w := g.CreateVertex()
+	u.CreateEdge(v)
+	result := g.AnyEdgeWhere(func(e *Edge) bool { return e.IsIncident(w) })
+	assert.Nil(t, result)
+}
+
+func TestAnyEdgeWhereEmptyGraph(t *testing.T) {
+	g := NewGraph()
+	result := g.AnyEdgeWhere(func(e *Edge) bool { return true })
+	assert.Nil(t, result)
+}
+
 func TestVertexSliceCreation(t *testing.T) {
 	g := NewGraph()
 	u := g.CreateVertex()
@@ -698,4 +827,68 @@ func TestReverseArcLinkPanics(t *testing.T) {
 	v := g.CreateVertex()
 	var link Link = v.CreateArc(u)
 	assert.Panics(t, func() { ReverseLinkGetArc(link) })
+}
+
+func TestCreateArcs(t *testing.T) {
+	g := NewGraph()
+	vs := g.CreateVertices(4)
+	arcs := vs[0].CreateArcs([]*Vertex{vs[1], vs[2], vs[3]})
+	assert.Equal(t, 3, len(arcs))
+	assert.Equal(t, 3, g.ArcCount())
+	assert.Equal(t, 3, vs[0].OutDegree())
+	for i, a := range arcs {
+		assert.Equal(t, vs[0], a.Source())
+		assert.Equal(t, vs[i+1], a.Target())
+		assert.Equal(t, 1, vs[i+1].InDegree())
+	}
+}
+
+func TestCreateEdges(t *testing.T) {
+	g := NewGraph()
+	vs := g.CreateVertices(4)
+	edges := vs[0].CreateEdges([]*Vertex{vs[1], vs[2], vs[3]})
+	assert.Equal(t, 3, len(edges))
+	assert.Equal(t, 3, g.EdgeCount())
+	assert.Equal(t, 3, vs[0].Degree())
+	for i, e := range edges {
+		assert.True(t, e.IsIncident(vs[0]))
+		assert.True(t, e.IsIncident(vs[i+1]))
+		assert.Equal(t, 1, vs[i+1].Degree())
+	}
+}
+
+func TestGraphArcSlice(t *testing.T) {
+	g := NewGraph()
+	u := g.CreateVertex()
+	v := g.CreateVertex()
+	w := g.CreateVertex()
+	a1 := u.CreateArc(v)
+	a2 := v.CreateArc(w)
+	a3 := w.CreateArc(u)
+	arcs := g.Arcs()
+	assert.Equal(t, 3, len(arcs))
+	assert.True(t, slices.Contains(arcs, a1))
+	assert.True(t, slices.Contains(arcs, a2))
+	assert.True(t, slices.Contains(arcs, a3))
+	// snapshot: modifying the returned slice does not affect the graph
+	arcs[0] = nil
+	assert.Equal(t, 3, g.ArcCount())
+}
+
+func TestGraphEdgeSlice(t *testing.T) {
+	g := NewGraph()
+	u := g.CreateVertex()
+	v := g.CreateVertex()
+	w := g.CreateVertex()
+	e1 := u.CreateEdge(v)
+	e2 := v.CreateEdge(w)
+	e3 := w.CreateEdge(u)
+	edges := g.Edges()
+	assert.Equal(t, 3, len(edges))
+	assert.True(t, slices.Contains(edges, e1))
+	assert.True(t, slices.Contains(edges, e2))
+	assert.True(t, slices.Contains(edges, e3))
+	// snapshot: modifying the returned slice does not affect the graph
+	edges[0] = nil
+	assert.Equal(t, 3, g.EdgeCount())
 }
