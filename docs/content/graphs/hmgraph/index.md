@@ -102,7 +102,7 @@ vertexMap.Set(u, 3.2)
 vertexMap.Set(v, 6.2)
 w := g.CreateVertex()
 a := u.CreateArc(v)
-e, _ := w.CreateEdge(v)
+e := w.CreateEdge(v)
 arcMap := hmgraph.CreateArcMap(g, "intCost", 0)
 arcMap.Set(a, 2)
 edgeMap := hmgraph.CreateEdgeMap(g, "color", "blue")
@@ -166,13 +166,23 @@ follows the visitor pattern:
 
 ### Graph queries
 
-* `NodeCount() int`, `ArcCount() int` and `EdgeCount() int` provide vertex, arc and edge counts, respectively.
+* `VertexCount() int`, `ArcCount() int` and `EdgeCount() int` provide vertex, arc and edge counts, respectively.
 * `ForVertices(visitor func(*Vertex))`, `ForArcs(visitor func(*Arc))`, `ForEdges(visitor func(*Edge))` call a given
-  function for every vertex, arc or edge
+  function for every vertex, arc or edge.
+* `Vertices() []*Vertex`, `Arcs() []*Arc`, `Edges() []*Edge` return a snapshot slice; prefer the `For*` visitors when
+  possible.
+* `AnyVertex() *Vertex`, `AnyArc() *Arc`, `AnyEdge() *Edge` return an arbitrary vertex, arc or edge (panic if the graph has none of that element type).
+* `AnyVertexWhere(func(*Vertex) bool) *Vertex`, `AnyArcWhere(func(*Arc) bool) *Arc`, `AnyEdgeWhere(func(*Edge) bool) *Edge` return an arbitrary element satisfying the predicate, or `nil` if none does.
+* `ContainsEdgesOrArcs() bool` returns true if the graph has at least one arc or edge.
 
 ### Vertex queries
 
-* `InDegree() int`, `OutDegree() int` und  `Degree() int` provide the number of a single node's inbound/outbound arcs or
-  the number of incident edges.* `ForOutArcs(visitor func(*Arc))`, `ForInArcs(visitor func(*Arc))` und
-  `ForEdges(visitor func(*Edge))` call a given function for every inbound arc, outbound arc or incident edge. 
+* `InDegree() int`, `OutDegree() int`, `Degree() int` provide the number of a vertex's inbound arcs, outbound arcs and
+  incident edges, respectively.
+* `ForOutArcs(visitor func(*Arc))`, `ForInArcs(visitor func(*Arc))`, `ForEdges(visitor func(*Edge))` call a given
+  function for every outbound arc, inbound arc or incident edge.
+* `OutArcs() []*Arc`, `InArcs() []*Arc`, `Edges() []*Edge` return snapshot slices; prefer the `For*` visitors when
+  possible.
+* `Index() int` returns the vertex's current iteration index (not stable under graph modifications).
+* `Graph() *Graph` returns the graph the vertex belongs to.
 
