@@ -88,10 +88,9 @@ func ConnectedComponents(g *hmgraph.Graph, componentType ComponentType) (result 
 
 	// "repeated start"
 	g.ForVertices(func(v *hmgraph.Vertex) {
-		if indexMap.Get(v) != -1 {
-			return
+		if indexMap.Get(v) == -1 {
+			sccRecursion(v)
 		}
-		sccRecursion(v)
 	})
 	slices.Reverse(result)
 	return

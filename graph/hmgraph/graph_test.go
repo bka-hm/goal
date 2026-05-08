@@ -568,6 +568,47 @@ func TestEdgeSliceCreation(t *testing.T) {
 	assert.True(t, slices.Contains(v.Edges(), e2))
 }
 
+func TestEdgeVertices(t *testing.T) {
+	g := NewGraph()
+	u := g.CreateVertex()
+	v := g.CreateVertex()
+	e := u.CreateEdge(v)
+	verts := e.Vertices()
+	assert.True(t, (verts[0] == u && verts[1] == v) || (verts[0] == v && verts[1] == u))
+}
+
+func TestOutArcsSlice(t *testing.T) {
+	g := NewGraph()
+	u := g.CreateVertex()
+	v := g.CreateVertex()
+	w := g.CreateVertex()
+	a1 := u.CreateArc(v)
+	a2 := u.CreateArc(w)
+	out := u.OutArcs()
+	assert.Equal(t, 2, len(out))
+	assert.True(t, slices.Contains(out, a1))
+	assert.True(t, slices.Contains(out, a2))
+	// snapshot: modifying the returned slice does not affect the graph
+	out[0] = nil
+	assert.Equal(t, 2, u.OutDegree())
+}
+
+func TestInArcsSlice(t *testing.T) {
+	g := NewGraph()
+	u := g.CreateVertex()
+	v := g.CreateVertex()
+	w := g.CreateVertex()
+	a1 := u.CreateArc(w)
+	a2 := v.CreateArc(w)
+	in := w.InArcs()
+	assert.Equal(t, 2, len(in))
+	assert.True(t, slices.Contains(in, a1))
+	assert.True(t, slices.Contains(in, a2))
+	// snapshot: modifying the returned slice does not affect the graph
+	in[0] = nil
+	assert.Equal(t, 2, w.InDegree())
+}
+
 func TestEdgeRemoval(t *testing.T) {
 	g := NewGraph()
 	u := g.CreateVertex()
