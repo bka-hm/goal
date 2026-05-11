@@ -8,7 +8,7 @@ import (
 // DisjointSets is an interface for Disjoint-Sets types (providing union/find operations).
 type DisjointSets[E any] interface {
 
-	// MakeSet adds an element as a trivial subset.
+	// MakeSet adds an item as a trivial subset.
 	MakeSet(element E) base.Handle
 
 	// Union merges the two sets identified by the given handles.
