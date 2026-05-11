@@ -6,6 +6,12 @@ import (
 	"testing"
 )
 
+type myInt int
+
+func TestMaxValueUnsupportedTypePanic(t *testing.T) {
+	assert.Panics(t, func() { MaxValue[myInt]() })
+}
+
 func TestMaxValue(t *testing.T) {
 	assert.True(t, MaxValue[uint]() == math.MaxUint)
 	assert.True(t, MaxValue[uint8]() == math.MaxUint8)
