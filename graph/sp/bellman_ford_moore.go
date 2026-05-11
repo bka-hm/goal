@@ -26,16 +26,16 @@ import (
 //
 // Returns:
 //   - dist:        distance from the nearest source to each vertex
-//     (MaxValue[T] for unreachable vertices)
+//     (base.MaxValue[N]() for unreachable vertices)
 //   - predecessor: the incoming Link (arc or directed edge) on the shortest
 //     path, or nil for source vertices and unreachable vertices
 //   - err:         non-nil if a negative cycle is detected; dist and
 //     predecessor are disposed and nil in that case
-func BellmanFordMoore[T base.Number](g *hmgraph.Graph,
-	arcCosts *hmgraph.ArcMap[T], edgeCosts *hmgraph.EdgeMap[T],
+func BellmanFordMoore[N base.Number](g *hmgraph.Graph,
+	arcCosts *hmgraph.ArcMap[N], edgeCosts *hmgraph.EdgeMap[N],
 	sources []*hmgraph.Vertex) (
-	dist *hmgraph.VertexMap[T], predecessor *hmgraph.VertexMap[hmgraph.Link], err error) {
-	dist = hmgraph.CreateVertexMap(g, "dist", base.MaxValue[T]())
+	dist *hmgraph.VertexMap[N], predecessor *hmgraph.VertexMap[hmgraph.Link], err error) {
+	dist = hmgraph.CreateVertexMap(g, "dist", base.MaxValue[N]())
 	predecessor = hmgraph.CreateVertexMap[hmgraph.Link](g, "predecessor", nil)
 	inQ := hmgraph.CreateVertexMap(g, "inQ", false)
 	defer inQ.Dispose()
@@ -100,9 +100,9 @@ func BellmanFordMoore[T base.Number](g *hmgraph.Graph,
 
 // BellmanFordMooreSingle is a convenience wrapper around BellmanFordMoore for
 // the single-source case.
-func BellmanFordMooreSingle[T base.Number](g *hmgraph.Graph,
-	arcCosts *hmgraph.ArcMap[T], edgeCosts *hmgraph.EdgeMap[T],
+func BellmanFordMooreSingle[N base.Number](g *hmgraph.Graph,
+	arcCosts *hmgraph.ArcMap[N], edgeCosts *hmgraph.EdgeMap[N],
 	source *hmgraph.Vertex) (
-	dist *hmgraph.VertexMap[T], predecessor *hmgraph.VertexMap[hmgraph.Link], err error) {
+	dist *hmgraph.VertexMap[N], predecessor *hmgraph.VertexMap[hmgraph.Link], err error) {
 	return BellmanFordMoore(g, arcCosts, edgeCosts, []*hmgraph.Vertex{source})
 }
