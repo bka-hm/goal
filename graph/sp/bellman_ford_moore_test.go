@@ -1,0 +1,170 @@
+package sp
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"gitlab.lrz.de/hm/goal/graph/hmgraph"
+)
+
+func TestSimple(t *testing.T) {
+	g := hmgraph.NewGraph()
+	eCost := hmgraph.CreateEdgeMap(g, "cost", 1.0)
+	aCost := hmgraph.CreateArcMap(g, "cost", 1.0)
+	vs := g.CreateVertices(4)
+	a01 := vs[0].CreateArc(vs[1])
+	aCost.Set(a01, 3.2)
+	e02 := vs[2].CreateEdge(vs[0])
+	eCost.Set(e02, 2.0)
+	a03 := vs[0].CreateArc(vs[3])
+	aCost.Set(a03, 1.0)
+	a13 := vs[1].CreateArc(vs[3])
+	aCost.Set(a13, -1.0)
+	a21 := vs[2].CreateArc(vs[1])
+	aCost.Set(a21, 3.0)
+	a23 := vs[2].CreateArc(vs[3])
+	aCost.Set(a23, -3.5)
+	e31 := vs[3].CreateArc(vs[1])
+	aCost.Set(e31, 1.0)
+	dist, pred, err := BellmanFordMoore(g, aCost, eCost, vs[0:1])
+	assert.Nil(t, err)
+	assert.Equal(t, 0.0, dist.Get(vs[0]))
+	assert.Equal(t, -0.5, dist.Get(vs[1]))
+	assert.Equal(t, 2.0, dist.Get(vs[2]))
+	assert.Equal(t, -1.5, dist.Get(vs[3]))
+	assert.Nil(t, pred.Get(vs[0]))
+	assert.Equal(t, pred.Get(vs[1]).Source(), vs[3])
+	assert.Equal(t, pred.Get(vs[2]).Source(), vs[0])
+	assert.Equal(t, pred.Get(vs[3]).Source(), vs[2])
+	vm, am, em := g.MapCount()
+	assert.Equal(t, 2, vm)
+	assert.Equal(t, 1, am)
+	assert.Equal(t, 1, em)
+}
+
+func TestNegativeEdge(t *testing.T) {
+	g := hmgraph.NewGraph()
+	eCost := hmgraph.CreateEdgeMap(g, "cost", 1.0)
+	aCost := hmgraph.CreateArcMap(g, "cost", 1.0)
+	vs := g.CreateVertices(4)
+	a01 := vs[0].CreateArc(vs[1])
+	aCost.Set(a01, 3.2)
+	e02 := vs[2].CreateEdge(vs[0])
+	eCost.Set(e02, 2.0)
+	a03 := vs[0].CreateArc(vs[3])
+	aCost.Set(a03, 1.0)
+	a13 := vs[1].CreateArc(vs[3])
+	aCost.Set(a13, -1.0)
+	a21 := vs[2].CreateArc(vs[1])
+	aCost.Set(a21, 3.0)
+	e23 := vs[2].CreateEdge(vs[3])
+	eCost.Set(e23, -3.5)
+	e31 := vs[3].CreateArc(vs[1])
+	aCost.Set(e31, 1.0)
+	_, _, err := BellmanFordMoore(g, aCost, eCost, vs[0:1])
+	vm, am, em := g.MapCount()
+	assert.Equal(t, 0, vm)
+	assert.Equal(t, 1, am)
+	assert.Equal(t, 1, em)
+	assert.Error(t, err)
+}
+
+func TestNegativeCycle(t *testing.T) {
+	g := hmgraph.NewGraph()
+	eCost := hmgraph.CreateEdgeMap(g, "cost", 1.0)
+	aCost := hmgraph.CreateArcMap(g, "cost", 1.0)
+	vs := g.CreateVertices(4)
+	a01 := vs[0].CreateArc(vs[1])
+	aCost.Set(a01, 3.2)
+	e02 := vs[2].CreateEdge(vs[0])
+	eCost.Set(e02, 2.0)
+	a03 := vs[0].CreateArc(vs[3])
+	aCost.Set(a03, 1.0)
+	a13 := vs[1].CreateArc(vs[3])
+	aCost.Set(a13, -2.0)
+	a21 := vs[2].CreateArc(vs[1])
+	aCost.Set(a21, 3.0)
+	e23 := vs[2].CreateEdge(vs[3])
+	eCost.Set(e23, -3.5)
+	e31 := vs[3].CreateArc(vs[1])
+	aCost.Set(e31, 1.0)
+	_, _, err := BellmanFordMoore(g, aCost, eCost, vs[0:1])
+	vm, am, em := g.MapCount()
+	assert.Equal(t, 0, vm)
+	assert.Equal(t, 1, am)
+	assert.Equal(t, 1, em)
+	assert.Error(t, err)
+}
+
+func TestJohnson(t *testing.T) {
+	g := hmgraph.NewGraph()
+	eCost := hmgraph.CreateEdgeMap(g, "cost", 1.0)
+	aCost := hmgraph.CreateArcMap(g, "cost", 1.0)
+	vs := g.CreateVertices(4)
+	a01 := vs[0].CreateArc(vs[1])
+	aCost.Set(a01, -2.2)
+	e02 := vs[2].CreateEdge(vs[0])
+	eCost.Set(e02, 2.0)
+	a03 := vs[0].CreateArc(vs[3])
+	aCost.Set(a03, 1.0)
+	a13 := vs[1].CreateArc(vs[3])
+	aCost.Set(a13, -1.0)
+	a21 := vs[2].CreateArc(vs[1])
+	aCost.Set(a21, 3.0)
+	a23 := vs[2].CreateArc(vs[3])
+	aCost.Set(a23, -3.5)
+	e31 := vs[3].CreateArc(vs[1])
+	aCost.Set(e31, 1.0)
+	dist, pred, err := BellmanFordMoore(g, aCost, eCost, vs)
+	assert.Nil(t, err)
+	assert.Equal(t, 0.0, dist.Get(vs[0]))
+	assert.Equal(t, -2.5, dist.Get(vs[1]))
+	assert.Equal(t, 0.0, dist.Get(vs[2]))
+	assert.Equal(t, -3.5, dist.Get(vs[3]))
+	assert.Nil(t, pred.Get(vs[0]))
+	assert.Equal(t, pred.Get(vs[1]).Source(), vs[3])
+	assert.Nil(t, nil, pred.Get(vs[2]))
+	assert.Equal(t, pred.Get(vs[3]).Source(), vs[2])
+	vm, am, em := g.MapCount()
+	assert.Equal(t, 2, vm)
+	assert.Equal(t, 1, am)
+	assert.Equal(t, 1, em)
+}
+
+func TestNegativeCycle2(t *testing.T) {
+	g := hmgraph.NewGraph()
+	eCost := hmgraph.CreateEdgeMap(g, "cost", 1.0)
+	aCost := hmgraph.CreateArcMap(g, "cost", 1.0)
+
+	vs := g.CreateVertices(3)
+	// Erzeugen eines negativen Zyklus: v0 -> v1 -> v2 -> v0
+	a01 := vs[0].CreateArc(vs[1])
+	aCost.Set(a01, 1.0)
+	a12 := vs[1].CreateArc(vs[2])
+	aCost.Set(a12, 1.0)
+	a20 := vs[2].CreateArc(vs[0])
+	aCost.Set(a20, -4.0) // Negativer Zyklus: Gesamtkosten = -2
+
+	_, _, err := BellmanFordMoore(g, aCost, eCost, vs[0:1])
+	assert.Error(t, err)
+}
+
+func TestUndirectedEdge(t *testing.T) {
+	g := hmgraph.NewGraph()
+	eCost := hmgraph.CreateEdgeMap(g, "cost", 1.0)
+	aCost := hmgraph.CreateArcMap(g, "cost", 1.0)
+
+	vs := g.CreateVertices(3)
+	// Ungerichtete Kante zwischen v0 und v1
+	e01 := vs[0].CreateEdge(vs[1])
+	eCost.Set(e01, 2.0)
+
+	a12 := vs[1].CreateArc(vs[2])
+	aCost.Set(a12, 1.0)
+
+	dist, _, err := BellmanFordMoore(g, aCost, eCost, vs[0:1])
+	assert.NoError(t, err)
+	assert.Equal(t, 0.0, dist.Get(vs[0]))
+	assert.Equal(t, 2.0, dist.Get(vs[1]))
+	assert.Equal(t, 3.0, dist.Get(vs[2]))
+}
