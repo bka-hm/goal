@@ -149,6 +149,24 @@ func TestNegativeCycle2(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestSingleSource(t *testing.T) {
+	g := hmgraph.NewGraph()
+	aCost := hmgraph.CreateArcMap(g, "cost", 0.0)
+	vs := g.CreateVertices(3)
+	a01 := vs[0].CreateArc(vs[1])
+	aCost.Set(a01, 1.0)
+	a12 := vs[1].CreateArc(vs[2])
+	aCost.Set(a12, 2.0)
+	dist, pred, err := BellmanFordMooreSingle(g, aCost, nil, vs[0])
+	assert.NoError(t, err)
+	assert.Equal(t, 0.0, dist.Get(vs[0]))
+	assert.Equal(t, 1.0, dist.Get(vs[1]))
+	assert.Equal(t, 3.0, dist.Get(vs[2]))
+	assert.Nil(t, pred.Get(vs[0]))
+	assert.Equal(t, vs[0], pred.Get(vs[1]).Source())
+	assert.Equal(t, vs[1], pred.Get(vs[2]).Source())
+}
+
 func TestUndirectedEdge(t *testing.T) {
 	g := hmgraph.NewGraph()
 	eCost := hmgraph.CreateEdgeMap(g, "cost", 1.0)

@@ -19,7 +19,7 @@ distance from *any* source to every vertex.
 
 **Complexity:** O(n · m) worst case, O(m) on average for typical inputs.
 
-## Function
+## Functions
 
 ```go
 func BellmanFordMoore[T base.Number](
@@ -28,7 +28,16 @@ func BellmanFordMoore[T base.Number](
     edgeCosts *hmgraph.EdgeMap[T],
     sources   []*hmgraph.Vertex,
 ) (dist *hmgraph.VertexMap[T], predecessor *hmgraph.VertexMap[hmgraph.Link], err error)
+
+func BellmanFordMooreSingle[T base.Number](
+    g         *hmgraph.Graph,
+    arcCosts  *hmgraph.ArcMap[T],
+    edgeCosts *hmgraph.EdgeMap[T],
+    source    *hmgraph.Vertex,
+) (dist *hmgraph.VertexMap[T], predecessor *hmgraph.VertexMap[hmgraph.Link], err error)
 ```
+
+`BellmanFordMooreSingle` is a convenience wrapper for the common single-source case.
 
 ### Parameters
 
@@ -61,7 +70,7 @@ vs[2].CreateArc(vs[3])
 costs := hmgraph.CreateArcMap(g, "cost", 0)
 // ... set individual arc costs ...
 
-dist, pred, err := sp.BellmanFordMoore(g, costs, nil, []*hmgraph.Vertex{vs[0]})
+dist, pred, err := sp.BellmanFordMooreSingle(g, costs, nil, vs[0])
 if err != nil {
     log.Fatal(err)
 }

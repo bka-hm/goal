@@ -97,3 +97,12 @@ func BellmanFordMoore[T base.Number](g *hmgraph.Graph,
 
 	return dist, predecessor, nil
 }
+
+// BellmanFordMooreSingle is a convenience wrapper around BellmanFordMoore for
+// the single-source case.
+func BellmanFordMooreSingle[T base.Number](g *hmgraph.Graph,
+	arcCosts *hmgraph.ArcMap[T], edgeCosts *hmgraph.EdgeMap[T],
+	source *hmgraph.Vertex) (
+	dist *hmgraph.VertexMap[T], predecessor *hmgraph.VertexMap[hmgraph.Link], err error) {
+	return BellmanFordMoore(g, arcCosts, edgeCosts, []*hmgraph.Vertex{source})
+}
