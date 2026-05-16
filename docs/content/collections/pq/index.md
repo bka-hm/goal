@@ -107,9 +107,7 @@ short (O(log n)), so all operations that follow the right spine are efficient.
 using pairwise merging, and returns both the heap and a slice of handles.
 
 ```go
-pq := pq.NewLeftistHeap[string, int]()
-
-pq, handles := pq.BuildLeftistHeap(
+q, handles := pq.BuildLeftistHeap(
     []string{"Alice", "Bob", "Carol"},
     []int{10, 3, 7},
 )

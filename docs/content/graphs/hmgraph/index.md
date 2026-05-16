@@ -1,12 +1,12 @@
 ---
 title: 'HMGraph'
 weight: 1
-summary: The `graphs/hmgraph` package contains a fast and versatile data structure for mixed directed/undirected graphs.
+summary: The `graph/hmgraph` package contains a fast and versatile data structure for mixed directed/undirected graphs.
 ---
 
-The `graphs/hmgraph` package contains a data structure for
+The `graph/hmgraph` package contains a data structure for
 hybrid/mixed graphs (possibly containing simultaneously both arcs and edges)
-with arbitrary many generic O(1)-accessible maps for vertices, edges and arcs.
+with arbitrarily many generic O(1)-accessible maps for vertices, edges and arcs.
 
 A *Graph* (`hmgraph.Graph`) is a graph potentially containing both arcs and
 edges, i.e. a tuple G=(V, A, E) of a set of vertices V,
@@ -30,18 +30,17 @@ w.CreateEdge(v) // same as v.CreateEdge(w)
 
 All operations run in (amortized) constant time (O(1)). Creation of loop edges will result in an
 error; loop arcs are allowed as well as parallel edges/arcs (multi-edges/arcs). A given
-number of vertices can be created at once using the function ```CreateVertices(n int)```. Creating multiple edges or
-arcs is supported via a ```CreateArcs``` and ```CreateEdges```, respectively.
+number of vertices can be created at once using the function `CreateVertices(n int)`. Creating multiple edges or
+arcs is supported via `CreateArcs` and `CreateEdges`, respectively.
 
-The difference between ```Arc```s and ```Edge```s is that an ```Arc``` connect two Vertices directionally, i.e. they
-have a *source* and a *target* vertex whereas an ```Edge``` connects two unordered vertices.
+The difference between `Arc`s and `Edge`s is that an `Arc` connects two vertices directionally, i.e. it has a *source* and a *target* vertex, whereas an `Edge` connects two unordered vertices.
 
 ## Conversion to `string`
 
 Graphs support standard conversion to `string`:
 
 ```go
-fmt.Println("%v", g)
+fmt.Printf("%v", g)
 ```
 
 will, for the above example, result in
@@ -88,7 +87,7 @@ Storing additional data for vertices and arcs/edges is possible using generic ma
 They can be created at any time after creation of the graph. 
 That is, maps can be created before all
 vertices/arcs/edges are created and will work even when vertices/arcs/edges are added or removed.
-Each map increases memory consumption by O(|V|), O(|E|) od O(|A|).
+Each map increases memory consumption by O(|V|), O(|E|) or O(|A|).
 
 Maps are created with functions `hmgraph.CreateVertexMap`, `hmgraph.CreateArcMap` and `hmgraph.CreateEdgeMap`.
 In addition to the graph itself, each map stores a label and a default value, which also defines the map's value type.
@@ -135,7 +134,7 @@ Graph
 Maps are registered with a graph to adapt to changes (deletion/addition of elements). Therefore, they continue to exist
 until they are explicitly disposed.
 
-If a map is no longer needed, it should be de-registered by calling the respective ```Dispose()``` method. 
+If a map is no longer needed, it should be de-registered by calling the respective `Dispose()` method.
 After disposing, a map should not be accessed.
 
 ```go

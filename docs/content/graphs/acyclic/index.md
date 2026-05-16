@@ -1,10 +1,10 @@
 ---
 title: 'Acyclic'
 weight: 3
-summary: The `graphs/acyclic` package provides topological ordering and DAG detection for directed graphs.
+summary: The `graph/acyclic` package provides topological ordering and DAG detection for directed graphs.
 ---
 
-The `graphs/acyclic` package provides algorithms that operate on directed acyclic graphs (DAGs).
+The `graph/acyclic` package provides algorithms that operate on directed acyclic graphs (DAGs).
 All functions require a graph from the `hmgraph` package and expect it to contain only arcs (no
 undirected edges).
 

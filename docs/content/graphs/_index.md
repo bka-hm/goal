@@ -3,4 +3,4 @@ title: 'Graphs'
 weight: 3
 ---
 
-The `graphs` package contains data structures and algorithms for graphs.
+The `graph` package contains data structures and algorithms for graphs.

@@ -1,10 +1,10 @@
 ---
 title: 'Connectivity'
 weight: 2
-summary: The `graphs/connectivity` package finds strongly and weakly connected components using Tarjan's algorithm.
+summary: The `graph/connectivity` package finds strongly and weakly connected components using Tarjan's algorithm.
 ---
 
-The `graphs/connectivity` package finds connected components in mixed graphs (containing
+The `graph/connectivity` package finds connected components in mixed graphs (containing
 arcs, edges, or both). It supports two notions of connectivity, selected via `ComponentType`:
 
 * **Strongly connected** — every vertex is reachable from every other vertex following arc
@@ -63,8 +63,6 @@ vs[2].CreateArc(vs[0])
 
 fmt.Println(connectivity.IsStronglyConnected(g)) // true  — cycle covers all vertices
 fmt.Println(connectivity.IsWeaklyConnected(g))   // true
-
-vs[2].CreateArc(vs[0]) // already there, but consider a DAG instead:
 
 g2 := hmgraph.NewGraph()
 ws := g2.CreateVertices(3)
