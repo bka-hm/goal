@@ -158,6 +158,58 @@ func foo(g *hmgraph.Graph) {
 	defer visited.Dispose()
 ```
 
+## Links
+
+A `Link` is a connector (arc or edge) together with a chosen traversal direction. It provides a uniform
+`Source() *Vertex` / `Target() *Vertex` interface regardless of the underlying connector type.
+
+Links are needed whenever a direction must be imposed on a connector that does not have one by itself —
+most prominently when representing paths in mixed graphs, where each step can be either an arc or an edge
+traversed in a particular direction.
+
+### The three kinds of Link
+
+| Kind | How to obtain | Underlying type |
+|------|---------------|-----------------|
+| Forward arc | An `*Arc` directly (it implements `Link`) | `*Arc` |
+| Directed edge | `edge.AsLink(source *Vertex)` | internal `edgeLink` |
+| Reverse arc | `arc.AsReverseLink()` | internal `reverseArcLink` |
+
+```go
+// Forward arc: Arc already satisfies Link
+a := u.CreateArc(v)
+var l hmgraph.Link = a          // Source()=u, Target()=v
+
+// Directed edge: choose which endpoint is the source
+e := w.CreateEdge(v)
+l = e.AsLink(w)                 // Source()=w, Target()=v
+l = e.AsLink(v)                 // Source()=v, Target()=w
+
+// Reverse arc: traverse an arc against its direction
+l = a.AsReverseLink()           // Source()=v, Target()=u
+```
+
+### Type-checking and unwrapping
+
+| Function | Description |
+|----------|-------------|
+| `LinkIsArc(link) bool` | Reports whether the link is a forward arc. |
+| `LinkIsEdge(link) bool` | Reports whether the link is a directed edge. |
+| `LinkIsReverseArc(link) bool` | Reports whether the link is a reverse arc. |
+| `LinkGetArc(link) *Arc` | Returns the underlying `*Arc`; panics if not a forward arc. |
+| `LinkGetEdge(link) *Edge` | Returns the underlying `*Edge`; panics if not a directed edge. |
+| `ReverseLinkGetArc(link) *Arc` | Returns the underlying `*Arc` of a reverse arc; panics if not a reverse arc. |
+
+```go
+if hmgraph.LinkIsArc(l) {
+    arc := hmgraph.LinkGetArc(l)
+    // work with arc
+} else if hmgraph.LinkIsEdge(l) {
+    edge := hmgraph.LinkGetEdge(l)
+    // work with edge
+}
+```
+
 ## Query methods
 
 Graphs, vertices, arcs and edges provide standard operations. To protect the integrity of the internal structure, access
