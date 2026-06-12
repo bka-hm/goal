@@ -240,3 +240,153 @@ func TestDijkstraNegativeCycleReturnsError(t *testing.T) {
 	assert.Equal(t, 1, am)
 	assert.Equal(t, 1, em)
 }
+
+// TestSPFANonNegativeUnchanged: with non-negative costs the result must be
+// identical to the original Dijkstra behaviour (regression guard).
+//
+//	0 -2→ 1 -1→ 2
+//	0 -6→ 2
+func TestSPFANonNegativeUnchanged(t *testing.T) {
+	g := hmgraph.NewGraph()
+	ac := hmgraph.CreateArcMap(g, "cost", 0.0)
+	ec := hmgraph.CreateEdgeMap(g, "cost", 0.0)
+	vs := g.CreateVertices(3)
+	ac.Set(vs[0].CreateArc(vs[1]), 2.0)
+	ac.Set(vs[0].CreateArc(vs[2]), 6.0)
+	ac.Set(vs[1].CreateArc(vs[2]), 1.0)
+
+	dist, _, err := Dijkstra(g, ac, ec, vs[0])
+
+	assert.NoError(t, err)
+	assert.Equal(t, 0.0, dist.Get(vs[0]))
+	assert.Equal(t, 2.0, dist.Get(vs[1]))
+	assert.Equal(t, 3.0, dist.Get(vs[2]))
+}
+
+// TestSPFANegativeArcRelaxation: a negative arc forces re-queuing of an
+// already-settled vertex and must yield the correct final distances.
+//
+//	0 -3→ 1 -(-2)→ 2
+//	0 -4→ 2
+//
+// Without re-insertion: dist[2] = 4 (direct arc wins initially).
+// With SPFA:            dist[2] = 1 (0+3-2 via vs[1] is cheaper).
+func TestSPFANegativeArcRelaxation(t *testing.T) {
+	g := hmgraph.NewGraph()
+	ac := hmgraph.CreateArcMap(g, "cost", 0.0)
+	ec := hmgraph.CreateEdgeMap(g, "cost", 0.0)
+	vs := g.CreateVertices(3)
+	ac.Set(vs[0].CreateArc(vs[1]), 3.0)
+	ac.Set(vs[1].CreateArc(vs[2]), -2.0)
+	ac.Set(vs[0].CreateArc(vs[2]), 4.0)
+
+	dist, pred, err := Dijkstra(g, ac, ec, vs[0])
+
+	assert.NoError(t, err)
+	assert.Equal(t, 0.0, dist.Get(vs[0]))
+	assert.Equal(t, 3.0, dist.Get(vs[1]))
+	assert.Equal(t, 1.0, dist.Get(vs[2]))
+	// Predecessor of vs[2] must be vs[1], not vs[0].
+	assert.Equal(t, vs[1], pred.Get(vs[2]).Source())
+}
+
+// TestSPFANoEarlyTerminationWithNegativeCosts: when negative costs exist,
+// early termination must be suppressed even if a target is specified.
+// The settled distance of the target can still decrease after first extraction.
+//
+//	0 -10→ 2  (target)
+//	0 -1→  1 -(-8)→ 2
+//
+// If early termination fired when vs[2] is first extracted (dist=10),
+// it would miss the cheaper path 0→1→2 = 1-8 = -7.
+func TestSPFANoEarlyTerminationWithNegativeCosts(t *testing.T) {
+	g := hmgraph.NewGraph()
+	ac := hmgraph.CreateArcMap(g, "cost", 0.0)
+	ec := hmgraph.CreateEdgeMap(g, "cost", 0.0)
+	vs := g.CreateVertices(3)
+	ac.Set(vs[0].CreateArc(vs[2]), 10.0)
+	ac.Set(vs[0].CreateArc(vs[1]), 1.0)
+	ac.Set(vs[1].CreateArc(vs[2]), -8.0)
+
+	dist, _, err := Dijkstra(g, ac, ec, vs[0], vs[2])
+
+	assert.NoError(t, err)
+	// Must be -7, not 10.
+	assert.Equal(t, -7.0, dist.Get(vs[2]))
+}
+
+// TestSPFANegativeCycleDetected: a graph with a negative cycle must return
+// a non-nil error; the dist and predecessor return values are unspecified.
+//
+//	0 -1→ 1 -1→ 2 -(-3)→ 1   (cycle 1→2→1 has total cost -2)
+func TestSPFANegativeCycleDetected(t *testing.T) {
+	g := hmgraph.NewGraph()
+	ac := hmgraph.CreateArcMap(g, "cost", 0.0)
+	ec := hmgraph.CreateEdgeMap(g, "cost", 0.0)
+	vs := g.CreateVertices(3)
+	ac.Set(vs[0].CreateArc(vs[1]), 1.0)
+	ac.Set(vs[1].CreateArc(vs[2]), 1.0)
+	ac.Set(vs[2].CreateArc(vs[1]), -3.0) // negative cycle: 1→2→1 costs -2
+
+	_, _, err := Dijkstra(g, ac, ec, vs[0])
+
+	assert.Error(t, err)
+}
+
+// TestSPFANegativeCycleNotReachable: a negative cycle that is unreachable from
+// the source must NOT trigger the error – the algorithm simply never touches it.
+//
+//	0 -1→ 1     (reachable, no cycle)
+//	2 -1→ 3 -(-3)→ 2   (negative cycle, but not reachable from 0)
+func TestSPFANegativeCycleNotReachable(t *testing.T) {
+	g := hmgraph.NewGraph()
+	ac := hmgraph.CreateArcMap(g, "cost", 0.0)
+	ec := hmgraph.CreateEdgeMap(g, "cost", 0.0)
+	vs := g.CreateVertices(4)
+	ac.Set(vs[0].CreateArc(vs[1]), 1.0)
+	ac.Set(vs[2].CreateArc(vs[3]), 1.0)
+	ac.Set(vs[3].CreateArc(vs[2]), -3.0) // unreachable negative cycle
+
+	dist, _, err := Dijkstra(g, ac, ec, vs[0])
+
+	assert.NoError(t, err)
+	assert.Equal(t, 0.0, dist.Get(vs[0]))
+	assert.Equal(t, 1.0, dist.Get(vs[1]))
+}
+
+// TestSPFAEarlyTerminationStillWorksWithoutNegativeCosts: with only positive
+// costs a target vertex must still trigger early termination.
+// We verify this indirectly: the vertex after the target stays at MaxValue
+// because it is never relaxed.
+//
+//	0 -1→ 1(target) -1→ 2
+func TestSPFAEarlyTerminationStillWorksWithoutNegativeCosts(t *testing.T) {
+	g := hmgraph.NewGraph()
+	ac := hmgraph.CreateArcMap(g, "cost", 0.0)
+	ec := hmgraph.CreateEdgeMap(g, "cost", 0.0)
+	vs := g.CreateVertices(3)
+	ac.Set(vs[0].CreateArc(vs[1]), 1.0)
+	ac.Set(vs[1].CreateArc(vs[2]), 1.0)
+
+	dist, _, err := Dijkstra(g, ac, ec, vs[0], vs[1])
+
+	assert.NoError(t, err)
+	assert.Equal(t, 1.0, dist.Get(vs[1]))
+	assert.Equal(t, base.MaxValue[float64](), dist.Get(vs[2]))
+}
+
+// TestSPFANoErrorOnValidGraph: the error return must be nil for any ordinary
+// (non-negative-cycle) graph, including ones with negative arcs.
+func TestSPFANoErrorOnValidGraph(t *testing.T) {
+	g := hmgraph.NewGraph()
+	ac := hmgraph.CreateArcMap(g, "cost", 0.0)
+	ec := hmgraph.CreateEdgeMap(g, "cost", 0.0)
+	vs := g.CreateVertices(4)
+	ac.Set(vs[0].CreateArc(vs[1]), 2.0)
+	ac.Set(vs[1].CreateArc(vs[2]), -1.0)
+	ac.Set(vs[2].CreateArc(vs[3]), 3.0)
+
+	_, _, err := Dijkstra(g, ac, ec, vs[0])
+
+	assert.NoError(t, err)
+}
